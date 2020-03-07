@@ -4,12 +4,16 @@
   "description": "Dictionary Command Line Tool",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel ./ --out-dir dist --ignore ./node_modules,./.babelrc,./package.json,./package-lock.json,./dist  --copy-files",
+    "start": "npm run build"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "await-to-js": "^2.1.1",
     "babel-cli": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "commander": "^4.1.1",
     "inquirer": "^7.0.6",
