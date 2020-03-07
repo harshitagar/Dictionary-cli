@@ -23,26 +23,27 @@ commander
 
 commander
 .command('ant <word>')
-.alias('d')
+.alias('a')
 .action((word)=>{
     actionsController.getAntonym(word);
 });
 
 commander
 .command('ex <word>')
-.alias('d')
+.alias('e')
 .action((word)=>{
     actionsController.getExamples(word);
 });
 
 commander
-.arguments('[word]')
+.arguments('<word>')
 .action( (word)=>{
     actionsController.getAll(word);
 });
 
 if(process.argv.length == 2){
-    let [err,word] = await to(actionsController.getRandomWord());
+    console.log("in nothing");
+    actionsController.getAllWithRandom();
 }
 
 commander.parse(process.argv);

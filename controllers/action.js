@@ -8,7 +8,7 @@ export default class actionController {
         constructor(){
             this.urlSpecifier ={
                 defn :  "/definitions?api_key=",
-                exmp : "/this.examples?api_key=",
+                exmp : "/examples?api_key=",
                 reltd : "/relatedWords?api_key=",
                 randm : "/randomWord?api_key="
             }
@@ -31,7 +31,7 @@ export default class actionController {
         let url = host.apihost + word + this.urlSpecifier.reltd +host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
-            console.log("Error "+err);
+            console.log("Error "+ err.error);
         }else{
             var flag = 0;
             result.forEach((data)=>{
@@ -50,18 +50,18 @@ export default class actionController {
         let url = host.apihost + word + this.urlSpecifier.reltd +host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
-            console.log("Error "+err);
+            console.log("Error "+ err.error);
         }else{
             var flag = 0;
             result.forEach((data)=>{
                if(data.relationshipType == "antonym"){
-                console.log("Below are the Synonyms of the word " + word + "\n");
+                console.log("Below are the antonyms of the word " + word + "\n");
                 data.words.forEach((word) =>{
                     flag = 1;
                     console.log(word);
                 })
                }
-               if(!flag) console.log("Sorry, there is no synonym found");
+               if(!flag) console.log("Sorry, there is no antonym found");
             })
         }
     }
@@ -69,9 +69,9 @@ export default class actionController {
         let url = host.apihost + word + this.urlSpecifier.exmp +host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
-            console.log("Error "+err);
+            console.log("Error "+ err.error);
         }else{
-            console.log("Below are the definition of the word " + word + "\n");
+            console.log("Below are the examples of the word " + word + "\n");
             result.examples.forEach((data)=>{
                 console.log(data.text);
             })
@@ -84,7 +84,7 @@ export default class actionController {
         await this.getExamples(word);
     }
     async getRandomWord(){
-        let url = host.apihost + word + this.urlSpecifier.exmp +host.api_key;
+        let url = host.apihostRand+this.urlSpecifier.randm+host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
             console.log("Error "+err.error);
@@ -95,7 +95,9 @@ export default class actionController {
         }
     }
     async getAllWithRandom(){
+        console.log("in ranmnn")
         let [err,word] = await to(this.getRandomWord());
+        console.log(err);
         if(!err){
            this.getAll(word);
        }
