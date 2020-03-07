@@ -6,7 +6,6 @@ export default class apiController {
     constructor(){
     }
     async getApiResult(url){
-        console.log("inside get api "+url);
           const [err,res] = await to(r2(url).json);
           if(res.error){
            return Promise.reject(res);

@@ -1,9 +1,10 @@
-import {host} from '../constants'
-import to from "await-to-js"
-import apiController from '../services/api'
+import {host} from '../constants';
+import to from "await-to-js";
+import apiController from '../services/api';
+import formatter from './formatter';
 import 'babel-polyfill'
 const apiCall = new apiController();
-
+const formatterController = new formatter();
 export default class actionController {
         constructor(){
             this.urlSpecifier ={
@@ -12,56 +13,51 @@ export default class actionController {
                 reltd : "/relatedWords?api_key=",
                 randm : "/randomWord?api_key="
             }
-
         }
     async getDefinition(word){
         let url = host.apihost + word + this.urlSpecifier.defn +host.api_key; 
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
-            console.log("Error "+ err.error);
+            formatterController.formatError("Error "+ err.error);
         }else{
-            console.log("Below are the definition of the word " + word + "\n");
-            result.forEach((data)=>{
-                console.log(data.text);
+            formatterController.formatHeading("\n"+"Below are the definition of the word " + word + "\n");
+            result.forEach((data,i)=>{
+                formatterController.formatData(i+1+"."+data.text);
             })
         }
     }
 
-    async getSynonym(word){
+    async getAntonymSynonym(word){
         let url = host.apihost + word + this.urlSpecifier.reltd +host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
-            console.log("Error "+ err.error);
+            formatterController.formatError("Error "+ err.error);
         }else{
-            var flag = 0;
             result.forEach((data)=>{
-               if(data.relationshipType == "synonym"){
-                console.log("Below are the Synonyms of the word " + word + "\n");
-                data.words.forEach((word) =>{
-                    flag = 1;
-                    console.log(word);
+               let related=data.relationshipType
+                formatterController.formatHeading("\n"+"Below are the "+related+" of the word " + word + "\n");
+                data.words.forEach((word,i) =>{
+                    formatterController.formatData(i+1+"."+word);
                 })
-               }
-               if(!flag) console.log("Sorry, there is no synonym found");
             })
         }
     }
-    async getAntonym(word){
+    async getAntonymOrSynonym(word,related){
         let url = host.apihost + word + this.urlSpecifier.reltd +host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
-            console.log("Error "+ err.error);
+            formatterController.formatError("Error "+ err.error);
         }else{
             var flag = 0;
             result.forEach((data)=>{
-               if(data.relationshipType == "antonym"){
-                console.log("Below are the antonyms of the word " + word + "\n");
-                data.words.forEach((word) =>{
+               if(data.relationshipType == related){
+                formatterController.formatHeading("\n"+"Below are the " + related + " of the word " + word + "\n");
+                data.words.forEach((word,i) =>{
                     flag = 1;
-                    console.log(word);
+                    formatterController.formatData(i+1+"."+word);
                 })
                }
-               if(!flag) console.log("Sorry, there is no antonym found");
+               if(!flag) formatterController.formatError("Sorry, there is no "+ related + " found");
             })
         }
     }
@@ -69,35 +65,32 @@ export default class actionController {
         let url = host.apihost + word + this.urlSpecifier.exmp +host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
-            console.log("Error "+ err.error);
+           formatterController.formatError("Error "+ err.error);
         }else{
-            console.log("Below are the examples of the word " + word + "\n");
-            result.examples.forEach((data)=>{
-                console.log(data.text);
+            formatterController.formatHeading("\n"+"Below are the examples of the word " + word + "\n");
+            result.examples.forEach((data,i)=>{
+                formatterController.formatData(i+1+"."+data.text);
             })
         }
     }
     async getAll(word){
         await this.getDefinition(word);
-        await this.getAntonym(word);
-        await this.getSynonym(word);
+        await this.getAntonymSynonym(word);
         await this.getExamples(word);
     }
     async getRandomWord(){
         let url = host.apihostRand+this.urlSpecifier.randm+host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
-            console.log("Error "+err.error);
+           formatterController.formatError("Error "+err.error);
             return Promise.reject("Error");
         }else{
-            console.log(result);
+            formatterController.formatHeading("Random Number is"+result.word);
             return result.word;
         }
     }
     async getAllWithRandom(){
-        console.log("in ranmnn")
         let [err,word] = await to(this.getRandomWord());
-        console.log(err);
         if(!err){
            this.getAll(word);
        }

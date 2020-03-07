@@ -18,14 +18,14 @@ commander
 .command('syn <word>')
 .alias('s')
 .action((word)=>{
-    actionsController.getSynonym(word);
+    actionsController.getAntonymOrSynonym(word , "synonym");
 });
 
 commander
 .command('ant <word>')
 .alias('a')
 .action((word)=>{
-    actionsController.getAntonym(word);
+    actionsController.getAntonymOrSynonym(word, "antonym");
 });
 
 commander
@@ -42,7 +42,6 @@ commander
 });
 
 if(process.argv.length == 2){
-    console.log("in nothing");
     actionsController.getAllWithRandom();
 }
 
