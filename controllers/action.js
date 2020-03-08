@@ -2,7 +2,8 @@ import {host} from '../constants';
 import to from "await-to-js";
 import apiController from '../services/api';
 import formatter from './formatter';
-import 'babel-polyfill'
+import 'babel-polyfill';
+
 
 const apiCall = new apiController();
 const formatterController = new formatter();
@@ -17,9 +18,10 @@ export default class actionController {
             }
         }
 
-
     async getDefinition(word){
+        formatterController.startSpinner();
         const [err,result] = await to(this.getDefinitionData(word));
+        formatterController.stopSpinner();
         if(err){
             formatterController.formatError("Error "+ err.error);
         }else{
@@ -40,8 +42,10 @@ export default class actionController {
     }
     
     async getAntonymSynonym(word){
+        formatterController.startSpinner();
         let url = host.apihost + word + this.urlSpecifier.reltd +host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
+        formatterController.stopSpinner();
         if(err){
             formatterController.formatError("Error "+ err.error);
         }else{
@@ -55,7 +59,9 @@ export default class actionController {
         }
     }
     async getAntonymOrSynonym(word,related){
+        formatterController.startSpinner();
         const [err,result] = await to(this.getAntonymOrSynonymData(word,related));
+        formatterController.stopSpinner();
         if(err){
             formatterController.formatError("Error "+ err.error);
         }else{
@@ -78,11 +84,19 @@ export default class actionController {
         if(err){
            return Promise.reject(err);
         }else{
-           return result;
+            let arr = [];
+            result.forEach(data => {
+                if(data.relationshipType == related){
+                    arr.push(data);
+                }
+            })
+           return arr;
         }
     }
     async getExamples(word){
+        formatterController.startSpinner();
         const [err,result] = await to(this.getExamplesData(word));
+        formatterController.stopSpinner();
         if(err){
            formatterController.formatError("Error "+ err.error);
         }else{
