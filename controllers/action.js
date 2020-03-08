@@ -3,8 +3,10 @@ import to from "await-to-js";
 import apiController from '../services/api';
 import formatter from './formatter';
 import 'babel-polyfill'
+
 const apiCall = new apiController();
 const formatterController = new formatter();
+
 export default class actionController {
         constructor(){
             this.urlSpecifier ={
@@ -14,9 +16,10 @@ export default class actionController {
                 randm : "/randomWord?api_key="
             }
         }
+
+
     async getDefinition(word){
-        let url = host.apihost + word + this.urlSpecifier.defn +host.api_key; 
-        const [err,result] = await to(apiCall.getApiResult(url));
+        const [err,result] = await to(this.getDefinitionData(word));
         if(err){
             formatterController.formatError("Error "+ err.error);
         }else{
@@ -25,8 +28,17 @@ export default class actionController {
                 formatterController.formatData(i+1+"."+data.text);
             })
         }
+    }   
+    async getDefinitionData(word){
+        let url = host.apihost + word + this.urlSpecifier.defn +host.api_key; 
+        const [err,result] = await to(apiCall.getApiResult(url));
+        if(err){
+            return Promise.reject(err);
+        }else{
+            return result;
+        }
     }
-
+    
     async getAntonymSynonym(word){
         let url = host.apihost + word + this.urlSpecifier.reltd +host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
@@ -43,8 +55,7 @@ export default class actionController {
         }
     }
     async getAntonymOrSynonym(word,related){
-        let url = host.apihost + word + this.urlSpecifier.reltd +host.api_key;
-        const [err,result] = await to(apiCall.getApiResult(url));
+        const [err,result] = await to(this.getAntonymOrSynonymData(word,related));
         if(err){
             formatterController.formatError("Error "+ err.error);
         }else{
@@ -57,13 +68,21 @@ export default class actionController {
                     formatterController.formatData(i+1+"."+word);
                 })
                }
-               if(!flag) formatterController.formatError("Sorry, there is no "+ related + " found");
             })
+            if(!flag) formatterController.formatError("Sorry, there is no "+ related + " found");
+        }
+    }
+    async getAntonymOrSynonymData(word,related){
+        let url = host.apihost + word + this.urlSpecifier.reltd +host.api_key;
+        const [err,result] = await to(apiCall.getApiResult(url));
+        if(err){
+           return Promise.reject(err);
+        }else{
+           return result;
         }
     }
     async getExamples(word){
-        let url = host.apihost + word + this.urlSpecifier.exmp +host.api_key;
-        const [err,result] = await to(apiCall.getApiResult(url));
+        const [err,result] = await to(this.getExamplesData(word));
         if(err){
            formatterController.formatError("Error "+ err.error);
         }else{
@@ -71,6 +90,15 @@ export default class actionController {
             result.examples.forEach((data,i)=>{
                 formatterController.formatData(i+1+"."+data.text);
             })
+        }
+    }
+    async getExamplesData(word){
+        let url = host.apihost + word + this.urlSpecifier.exmp +host.api_key;
+        const [err,result] = await to(apiCall.getApiResult(url));
+        if(err){
+          Promise.reject(err);
+        }else{
+           return result;
         }
     }
     async getAll(word){
@@ -82,10 +110,8 @@ export default class actionController {
         let url = host.apihostRand+this.urlSpecifier.randm+host.api_key;
         const [err,result] = await to(apiCall.getApiResult(url));
         if(err){
-           formatterController.formatError("Error "+err.error);
             return Promise.reject("Error");
         }else{
-            formatterController.formatHeading("Random Number is"+result.word);
             return result.word;
         }
     }

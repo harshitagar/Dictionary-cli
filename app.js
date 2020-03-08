@@ -1,6 +1,6 @@
 import commander from "commander";
-import actionController from './controllers/action'
-import 'babel-polyfill'
+import actionController from './controllers/action';
+import interactor from './controllers/interactor';
 
 const actionsController = new actionController();
 commander
@@ -34,6 +34,14 @@ commander
 .action((word)=>{
     actionsController.getExamples(word);
 });
+
+commander
+.command('play')
+.alias('p')
+.action(async ()=>{
+    console.log("fhdjhf");
+   const InteractorController = new interactor();
+})
 
 commander
 .arguments('<word>')
